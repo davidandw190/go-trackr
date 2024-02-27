@@ -18,7 +18,10 @@ func main() {
 		ParseTime:            true,
 	}
 
-	sqlStorage := NewMySQLStorage(cfg)
+	sqlStorage, err := NewMySQLStorage(cfg)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	db, err := sqlStorage.Init()
 	if err != nil {
