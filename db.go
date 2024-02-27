@@ -11,24 +11,26 @@ type MySQLStorage struct {
 	db *sql.DB
 }
 
-func NewMySQLStorage(cfg mysql.Config) *MySQLStorage {
+func NewMySQLStorage(cfg mysql.Config) (*MySQLStorage, error) {
 	db, err := sql.Open("mysql", cfg.FormatDSN())
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("[ERROR] Failed to open MySQL connection: %v", err)
+		return nil, err
 	}
 
 	err = db.Ping()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("[ERROR] Failed to ping MySQL: %v", err)
+		return nil, err
 	}
 
-	log.Println("[*] Connected to MySQL!")
+	log.Println("[INFO] Connected to MySQL successfully")
 
-	return &MySQLStorage{db: db}
+	return &MySQLStorage{db: db}, nil
 }
 
 func (s *MySQLStorage) Init() (*sql.DB, error) {
-	// init tables if it is the case
+	// Initialize tables if necessary
 	if err := s.createUsersTable(); err != nil {
 		return nil, err
 	}
@@ -44,8 +46,19 @@ func (s *MySQLStorage) Init() (*sql.DB, error) {
 	return s.db, nil
 }
 
+func (s *MySQLStorage) createTable(tableName, query string) error {
+	_, err := s.db.Exec(query)
+	if err != nil {
+		log.Printf("[ERROR] Failed to create table %s: %v", tableName, err)
+		return err
+	}
+
+	log.Printf("[INFO] Table %s created successfully", tableName)
+	return nil
+}
+
 func (s *MySQLStorage) createUsersTable() error {
-	_, err := s.db.Exec(`
+	query := `
 		CREATE TABLE IF NOT EXISTS users (
 			user_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
 			email VARCHAR(255) NOT NULL,
@@ -57,13 +70,12 @@ func (s *MySQLStorage) createUsersTable() error {
 			PRIMARY KEY (user_id),
 			UNIQUE KEY (email)
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-	`)
-
-	return err
+	`
+	return s.createTable("users", query)
 }
 
 func (s *MySQLStorage) createProjectsTable() error {
-	_, err := s.db.Exec(`
+	query := `
 		CREATE TABLE IF NOT EXISTS projects (
 			project_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
 			name VARCHAR(255) NOT NULL,
@@ -71,26 +83,24 @@ func (s *MySQLStorage) createProjectsTable() error {
 
 			PRIMARY KEY (project_id)
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-	`)
-
-	return err
+	`
+	return s.createTable("projects", query)
 }
 
 func (s *MySQLStorage) createTasksTable() error {
-	_, err := s.db.Exec(`
+	query := `
 		CREATE TABLE IF NOT EXISTS tasks (
 			task_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
 			name VARCHAR(255) NOT NULL,
 			status ENUM('TODO', 'IN_PROGRESS', 'IN_TESTING', 'DONE') NOT NULL DEFAULT 'TODO',
 			project_id INT UNSIGNED NOT NULL,
 			assigned_to INT UNSIGNED NOT NULL,
-			createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+			created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
 			PRIMARY KEY (task_id),
 			FOREIGN KEY (assigned_to) REFERENCES users(user_id),
 			FOREIGN KEY (project_id) REFERENCES projects(project_id)
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-	`)
-
-	return err
+	`
+	return s.createTable("tasks", query)
 }
