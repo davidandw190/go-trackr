@@ -21,6 +21,8 @@ func (s *APIServer) Serve() {
 	subrouter := router.PathPrefix("/api/v1").Subrouter()
 
 	// register services
+	tasksService := NewTasksService(s.store)
+	tasksService.RegisterRoutes(router)
 
 	log.Println("Starting API server at", s.addr)
 
