@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/davidandw190/go-trackr/utils"
 	"github.com/gorilla/mux"
 )
 
@@ -30,6 +31,7 @@ func (ts *TasksService) RegisterRoutes(r *mux.Router) {
 func (ts *TasksService) handleCreateTask(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
+		http.Error(w, "Error reading request body", http.StatusBadRequest)
 		return
 	}
 
@@ -38,14 +40,23 @@ func (ts *TasksService) handleCreateTask(w http.ResponseWriter, r *http.Request)
 	var task *Task
 	err = json.Unmarshal(body, &task)
 	if err != nil {
-		// TODO
+		utils.WriteJSON(w, http.StatusBadRequest, ErrorResponse{Error: "Invalid request payload"})
 		return
 	}
 
 	if err = validateTaskPayload(task); err != nil {
-		// TODO
+		utils.WriteJSON(w, http.StatusBadRequest, ErrorResponse{Error: err.Error()})
 		return
 	}
+
+	t, err := ts.store.CreateTask(task)
+	if err != nil {
+		utils.WriteJSON(w, http.StatusInternalServerError, ErrorResponse{Error: "Error creating task"})
+		return
+	}
+
+	utils.WriteJSON(w, http.StatusCreated, t)
+
 }
 
 func (ts *TasksService) handleGetTask(w http.ResponseWriter, r *http.Request) {

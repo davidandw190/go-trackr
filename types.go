@@ -7,43 +7,47 @@ type CreateProjectPayload struct {
 }
 
 type Project struct {
-	ProjectID int64     `json:"project_id"`
+	ProjectID int64     `json:"projectId"`
 	Name      string    `json:"name"`
-	CreatedAt time.Time `json:"created_at"`
+	CreatedAt time.Time `json:"createdAt"`
 }
 
 type RegisterPayload struct {
 	Email     string `json:"email"`
-	FirstName string `json:"first_ame"`
-	LastName  string `json:"last_name"`
+	FirstName string `json:"firstName"`
+	LastName  string `json:"lastName"`
 	Password  string `json:"password"`
 }
 
 type User struct {
-	UserID    int64     `json:"id"`
+	UserID    int64     `json:"userId"`
 	Email     string    `json:"email"`
-	FirstName string    `json:"first_name"`
-	LastName  string    `json:"last_name"`
+	FirstName string    `json:"firstNaame"`
+	LastName  string    `json:"lastName"`
 	Password  string    `json:"password"`
 	CreatedAt time.Time `json:"createdAt"`
 }
 
 type CreateTaskPayload struct {
 	Name         string `json:"name"`
-	ProjectID    int64  `json:"project_id"`
-	AssignedToID int64  `json:"assigned_to"`
+	ProjectID    int64  `json:"projectId"`
+	AssignedToID int64  `json:"assignedTo"`
 }
 
 type Task struct {
-	ID         int64     `json:"id"`
+	ID         int64     `json:"taskId"`
 	Name       string    `json:"name"`
 	Status     string    `json:"status"`
-	ProjectID  int64     `json:"project_id"`
-	AssignedTo int64     `json:"assigned_to"`
-	CreatedAt  time.Time `json:"created_at"`
+	ProjectID  int64     `json:"projectId"`
+	AssignedTo int64     `json:"assignedTo"`
+	CreatedAt  time.Time `json:"createdAt"`
 }
 
 type LoginRequest struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
+}
+
+type ErrorResponse struct {
+	Error string `json:"error"`
 }
