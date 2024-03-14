@@ -4,7 +4,7 @@ import "database/sql"
 
 type Store interface {
 	// Users
-	CreateUser() error
+	CreateUser(u *User) (*User, error)
 	// Tasks
 	CreateTask(t *Task) (*Task, error)
 }

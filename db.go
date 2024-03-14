@@ -46,17 +46,6 @@ func (s *MySQLStorage) Init() (*sql.DB, error) {
 	return s.db, nil
 }
 
-func (s *MySQLStorage) createTable(tableName, query string) error {
-	_, err := s.db.Exec(query)
-	if err != nil {
-		log.Printf("[ERROR] Failed to create table %s: %v", tableName, err)
-		return err
-	}
-
-	log.Printf("[INFO] Table %s created successfully", tableName)
-	return nil
-}
-
 func (s *MySQLStorage) createUsersTable() error {
 	query := `
 		CREATE TABLE IF NOT EXISTS users (
@@ -103,4 +92,15 @@ func (s *MySQLStorage) createTasksTable() error {
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 	`
 	return s.createTable("tasks", query)
+}
+
+func (s *MySQLStorage) createTable(tableName, query string) error {
+	_, err := s.db.Exec(query)
+	if err != nil {
+		log.Printf("[ERROR] Failed to create table %s: %v", tableName, err)
+		return err
+	}
+
+	log.Printf("[INFO] Table %s created successfully", tableName)
+	return nil
 }
