@@ -8,7 +8,7 @@ func (s *MockStore) CreateTask(t *Task) (*Task, error) {
 	return &Task{}, nil
 }
 
-func (s *MockStore) GetTask(id string) (*Task, error) {
+func (s *MockStore) GetTaskByID(id string) (*Task, error) {
 	return &Task{}, nil
 }
 

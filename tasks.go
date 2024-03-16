@@ -19,14 +19,13 @@ type TasksService struct {
 	store Storage
 }
 
-// NewTasksService creates a new TasksService instance.
 func NewTasksService(s Storage) *TasksService {
 	return &TasksService{store: s}
 }
 
 func (ts *TasksService) RegisterRoutes(r *mux.Router) {
 	r.HandleFunc("/tasks", ts.handleCreateTask).Methods("POST")
-	r.HandleFunc("/tasks/{id}", ts.handleGetTask).Methods("GET")
+	r.HandleFunc("/tasks/{id}", ts.handleGetTaskByID).Methods("GET")
 
 }
 
@@ -61,8 +60,22 @@ func (ts *TasksService) handleCreateTask(w http.ResponseWriter, r *http.Request)
 
 }
 
-func (ts *TasksService) handleGetTask(w http.ResponseWriter, r *http.Request) {
+func (ts *TasksService) handleGetTaskByID(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
 
+	if id == "" {
+		utils.WriteJSON(w, http.StatusBadRequest, ErrorResponse{Error: "ID is required"})
+		return
+	}
+
+	t, err := ts.store.GetTaskByID(id)
+	if err != nil {
+		utils.WriteJSON(w, http.StatusInternalServerError, ErrorResponse{Error: "task not found"})
+		return
+	}
+
+	utils.WriteJSON(w, http.StatusOK, t)
 }
 
 func validateTaskPayload(task *Task) error {

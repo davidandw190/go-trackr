@@ -6,6 +6,7 @@ import "database/sql"
 type Storage interface {
 	// CreateTask creates a new task in the database.
 	CreateTask(t *Task) (*Task, error)
+	GetTaskByID(id string) (*Task, error)
 	// CreateUser creates a new user in the database.
 	CreateUser(u *User) (*User, error)
 }
@@ -37,6 +38,16 @@ func (s *Store) CreateTask(t *Task) (*Task, error) {
 
 	t.ID = id
 	return t, nil
+}
+
+func (s *Store) GetTaskByID(id string) (*Task, error) {
+	var t Task
+	err := s.db.QueryRow(`
+		SELECT task_id, name, status, project_id, assigned_to, created_at
+		FROM tasks
+		WHERE task_id = ?`, id).Scan(&t.ID, &t.Name, &t.ProjectID, &t.AssignedTo, &t.CreatedAt)
+
+	return &t, err
 }
 
 // CreateUser inserts a new user into the database.
