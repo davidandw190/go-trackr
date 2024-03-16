@@ -2,27 +2,30 @@ package gotrackr
 
 import "database/sql"
 
-type Store interface {
-	// Users
-	CreateUser(u *User) (*User, error)
-	// Tasks
+// Storage defines methods to interact with the database.
+type Storage interface {
+	// CreateTask creates a new task in the database.
 	CreateTask(t *Task) (*Task, error)
+	// CreateUser creates a new user in the database.
+	CreateUser(u *User) (*User, error)
 }
 
-type Storage struct {
+// Store implements the Storage interface.
+type Store struct {
 	db *sql.DB
 }
 
-func NewStore(db *sql.DB) *Storage {
-	return &Storage{
+// NewStore creates a new Store instance.
+func NewStore(db *sql.DB) *Store {
+	return &Store{
 		db: db,
 	}
 }
 
-func (s *Storage) CreateTask(t *Task) (*Task, error) {
+// CreateTask inserts a new task into the database.
+func (s *Store) CreateTask(t *Task) (*Task, error) {
 	rows, err := s.db.Exec(`INSERT INTO tasks (name, status, project_id, assigned_to)
-	VALUES (?, ? , ?, ?`, t.Name, t.Status, t.ProjectID, t.AssignedTo)
-
+	VALUES (?, ?, ?, ?)`, t.Name, t.Status, t.ProjectID, t.AssignedTo)
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +36,11 @@ func (s *Storage) CreateTask(t *Task) (*Task, error) {
 	}
 
 	t.ID = id
-
 	return t, nil
+}
 
+// CreateUser inserts a new user into the database.
+func (s *Store) CreateUser(u *User) (*User, error) {
+	// TODO: Implement user creation.
+	return nil, nil
 }

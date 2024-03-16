@@ -20,12 +20,12 @@ func main() {
 
 	sqlStorage, err := NewMySQLStorage(cfg)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("failed to initialize MySQL storage:", err)
 	}
 
 	db, err := sqlStorage.Init()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("failed to initialize database:", err)
 	}
 
 	store := NewStore(db)

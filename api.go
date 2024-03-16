@@ -7,20 +7,23 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// APIServer represents the HTTP API server.
 type APIServer struct {
 	addr  string
-	store Store
+	store Storage
 }
 
-func NewAPIServer(addr string, store Store) *APIServer {
+// NewAPIServer creates a new APIServer instance.
+func NewAPIServer(addr string, store Storage) *APIServer {
 	return &APIServer{addr: addr, store: store}
 }
 
+// Serve starts the API server.
 func (s *APIServer) Serve() {
 	router := mux.NewRouter()
 	subrouter := router.PathPrefix("/api/v1").Subrouter()
 
-	// register services
+	// Register services
 	tasksService := NewTasksService(s.store)
 	tasksService.RegisterRoutes(subrouter)
 

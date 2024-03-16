@@ -31,7 +31,7 @@ type User struct {
 type CreateTaskPayload struct {
 	Name         string `json:"name"`
 	ProjectID    int64  `json:"projectId"`
-	AssignedToID int64  `json:"assignedTo"`
+	AssignedTo int64  `json:"assignedTo"`
 }
 
 type Task struct {

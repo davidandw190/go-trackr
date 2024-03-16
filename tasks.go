@@ -14,11 +14,13 @@ var errNameRequired = errors.New("name is required")
 var errProjectIDRequired = errors.New("project id is required")
 var errUserIDRequired = errors.New("user id is required")
 
+// TasksService handles task-related API endpoints.
 type TasksService struct {
-	store Store
+	store Storage
 }
 
-func NewTasksService(s Store) *TasksService {
+// NewTasksService creates a new TasksService instance.
+func NewTasksService(s Storage) *TasksService {
 	return &TasksService{store: s}
 }
 
